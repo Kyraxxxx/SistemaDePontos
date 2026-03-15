@@ -223,10 +223,80 @@ function showView(viewName) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         target.classList.add('active');
         state.activeView = viewName;
-        renderAll();
+        try { renderAll(); } catch(e) {}
     }
 }
 window.showView = showView;
+
+// ==========================================
+// LOGIN & REGISTER (NUCLEAR FIX)
+// ==========================================
+window.actionEmployeeAuth = function() {
+    console.log("Botão clicado!");
+    try {
+        const nameInput = document.getElementById('emp-name-input');
+        const passInput = document.getElementById('emp-pass-input');
+        if (!nameInput || !passInput) { alert("Erro crítico: Campos não encontrados!"); return; }
+
+        const name = nameInput.value.trim();
+        const pass = passInput.value.trim();
+
+        if (!name || !pass) { alert("Digite Nome e Senha!"); return; }
+
+        // Tentar logar localmente INSTANTANEAMENTE se já tivermos o dado
+        const found = Object.entries(state.employees || {}).find(
+            ([, emp]) => emp.name && emp.name.toLowerCase() === name.toLowerCase() && !emp.deleted
+        );
+
+        if (found) {
+            const [id, emp] = found;
+            if (emp.password === pass) {
+                loginAs(id, 'employee');
+                return;
+            } else {
+                alert("Senha incorreta!");
+                return;
+            }
+        }
+
+        // Se não achou local, buscar no Firebase
+        const btn = document.querySelector('#login-step-employee .btn-primary');
+        if (btn) { btn.disabled = true; btn.innerHTML = "Aguarde..."; }
+
+        if (!db) { alert("Sem conexão com o Firebase!"); if(btn) btn.disabled=false; return; }
+
+        db.ref('employees').once('value', (snap) => {
+            const all = snap.val() || {};
+            const entries = Object.entries(all);
+            
+            const fbFound = entries.find(([, e]) => e.name && e.name.toLowerCase() === name.toLowerCase() && !e.deleted);
+            
+            if (fbFound) {
+                const [id, emp] = fbFound;
+                if (emp.password === pass) {
+                    state.employees[id] = emp;
+                    loginAs(id, 'employee');
+                } else {
+                    alert("Senha incorreta!");
+                }
+            } else {
+                // Novo cadastro
+                const data = { name, password: pass, goodStars: 0, badStars: 0, deleted: false };
+                db.ref('employees').push(data).then(ref => {
+                    state.employees[ref.key] = data;
+                    loginAs(ref.key, 'employee');
+                }).catch(err => alert("Erro ao cadastrar: " + err.message));
+            }
+            if (btn) { btn.disabled = false; btn.innerHTML = "LOGAR / CADASTRAR"; }
+        }, (err) => {
+            alert("Erro de conexão: " + err.message);
+            if (btn) { btn.disabled = false; btn.innerHTML = "LOGAR / CADASTRAR"; }
+        });
+
+    } catch (err) {
+        alert("Erro no código: " + err.message);
+    }
+};
 
 window.changeLoginStep = (step) => {
     const loginSteps = {
@@ -240,104 +310,6 @@ window.changeLoginStep = (step) => {
         target.classList.add('active');
         if (step === 'employee') renderNamelist();
     }
-};
-
-// ==========================================
-// LOGIN & REGISTER
-// ==========================================
-window.actionEmployeeAuth = () => {
-    const nameInput = document.getElementById('emp-name-input');
-    const passInput = document.getElementById('emp-pass-input');
-    if (!nameInput || !passInput) return;
-
-    const name = nameInput.value.trim();
-    const pass = passInput.value.trim();
-
-    if (!name || !pass) { alert("Digite Nome e Senha!"); return; }
-
-    // Verificar conta deletada
-    const deleted = Object.entries(state.employees || {}).find(
-        ([, emp]) => emp.name.toLowerCase() === name.toLowerCase() && emp.deleted
-    );
-    if (deleted) { alert("🔒 Esta conta foi desativada pelo Gerente."); return; }
-
-    // Tentar login local primeiro (dados já carregados)
-    const found = Object.entries(state.employees || {}).find(
-        ([, emp]) => emp.name.toLowerCase() === name.toLowerCase() && !emp.deleted
-    );
-
-    if (found) {
-        const [id, emp] = found;
-        if (emp.password === pass) {
-            loginAs(id, 'employee');
-        } else {
-            alert("Senha incorreta!");
-        }
-        return;
-    }
-
-    // Não achou local — buscar DIRETO no Firebase antes de cadastrar
-    const btn = document.querySelector('#login-step-employee .btn-primary');
-    const origText = btn ? btn.innerHTML : 'LOGAR / CADASTRAR';
-    if (btn) { btn.innerHTML = "Verificando..."; btn.disabled = true; }
-
-    const resetBtn = () => { if (btn) { btn.innerHTML = origText; btn.disabled = false; } };
-
-    if (!db) { 
-        alert("Erro: Banco de dados não inicializado! Verifique se os arquivos foram subidos corretamente."); 
-        resetBtn(); 
-        return; 
-    }
-
-    // DEBUG: Verificando se snap retorna
-    const timeout = setTimeout(() => {
-        alert("A conexão com o banco está demorando muito. Verifique se o DatabaseURL e as regras estão corretas!");
-        resetBtn();
-    }, 8000);
-
-    db.ref('employees').once('value').then(snap => {
-        clearTimeout(timeout);
-        const all = snap.val() || {};
-        const entries = Object.entries(all);
-
-        // Verificar se apagado no banco
-        const fbDeleted = entries.find(([, e]) => e.name?.toLowerCase() === name.toLowerCase() && e.deleted);
-        if (fbDeleted) { alert("🔒 Esta conta foi desativada pelo Gerente."); resetBtn(); return; }
-
-        // Verificar se existe no banco
-        const fbFound = entries.find(([, e]) => e.name?.toLowerCase() === name.toLowerCase() && !e.deleted);
-        if (fbFound) {
-            const [id, emp] = fbFound;
-            if (emp.password === pass) {
-                state.employees[id] = emp;
-                loginAs(id, 'employee');
-            } else {
-                alert("Senha incorreta!");
-                resetBtn();
-            }
-            return;
-        }
-
-        // Não existe: Novo cadastro
-        if (btn) { btn.innerHTML = "Cadastrando..."; }
-        const data = { name, password: pass, goodStars: 0, badStars: 0, deleted: false };
-        db.ref('employees').push(data)
-            .then(ref => {
-                state.employees[ref.key] = data;
-                loginAs(ref.key, 'employee');
-                alert("Cadastro realizado com sucesso!");
-            })
-            .catch(err => { 
-                console.error(err);
-                alert("Erro ao cadastrar: " + err.message); 
-                resetBtn(); 
-            });
-
-    }).catch(err => {
-        clearTimeout(timeout);
-        alert("Erro ao acessar banco: " + err.message);
-        resetBtn();
-    });
 };
 
 function loginAs(id, role) {
