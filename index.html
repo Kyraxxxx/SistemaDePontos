@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Metal Print - Pontuações v6</title>
+    <!-- Outfit Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+
+<body class="light-theme">
+
+    <div id="app">
+        <!-- TELA DE LOGIN (Inicia como ativa, sem loading obstrutivo) -->
+        <section id="screen-login" class="screen active">
+            <div class="login-container">
+                <header class="login-brand animate-down">
+                    <img src="Logo_PWA.png" alt="Logo" class="main-logo"
+                        onerror="this.src='https://placehold.co/120x120?text=MP'">
+                    <h1>Metal Print</h1>
+                    <p>Subtítulo Pontuações</p>
+                </header>
+
+                <main class="login-card animate-up">
+                    <div id="login-step-home" class="step active">
+                        <button class="btn btn-primary" onclick="changeLoginStep('employee')">
+                            <i class="fa-solid fa-user-check"></i> Sou Funcionário
+                        </button>
+                        <button class="btn btn-outline" onclick="changeLoginStep('manager')">
+                            <i class="fa-solid fa-shield-halved"></i> Painel Gerencial
+                        </button>
+                    </div>
+
+                    <div id="login-step-employee" class="step">
+                        <button class="back-link" onclick="changeLoginStep('home')"><i
+                                class="fa-solid fa-chevron-left"></i> Voltar</button>
+                        <h2>Acesso Funcionário</h2>
+                        <div class="login-form-group">
+                            <input type="text" id="emp-name-input" placeholder="Seu Nome">
+                            <input type="password" id="emp-pass-input" placeholder="Sua Senha">
+                            <button class="btn btn-primary" onclick="actionEmployeeAuth()">LOGAR / CADASTRAR</button>
+                        </div>
+                        <div class="divider"><span>ou escolha na lista</span></div>
+                        <div id="login-names-grid" class="names-grid">
+                            <!-- Injetado por JS -->
+                        </div>
+                    </div>
+
+                    <div id="login-step-manager" class="step">
+                        <button class="back-link" onclick="changeLoginStep('home')"><i
+                                class="fa-solid fa-chevron-left"></i> Voltar</button>
+                        <h2>Senha do Supervisor</h2>
+                        <input type="password" id="mgr-pass-input" placeholder="••••••••">
+                        <button class="btn btn-primary" onclick="actionMgrLoginStep()">Entrar</button>
+                    </div>
+                </main>
+            </div>
+        </section>
+
+        <!-- TELA DO FUNCIONÁRIO (DASHBOARD) -->
+        <section id="screen-employee" class="screen">
+            <header class="sticky-header">
+                <div class="meta-card">
+                    <div class="meta-info">
+                        <span class="meta-label">META: 17 ESTRELAS VERDES</span>
+                        <h2 id="header-prize-text" class="meta-prize">Prêmio: ...</h2>
+                    </div>
+                    <button class="btn-exit" onclick="actionLogout()"><i class="fa-solid fa-power-off"></i></button>
+                </div>
+            </header>
+
+            <main class="dash-body">
+                <!-- ABA: ESTRELAS (DASHBOARD) -->
+                <div id="tab-balance" class="tab-content active animate-fade">
+                    <div class="stars-overview">
+                        <div class="star-card green">
+                            <i class="fa-solid fa-star"></i>
+                            <div class="star-info">
+                                <span id="display-good-stars" class="star-val">0</span>
+                                <span class="star-lbl">VERDES</span>
+                            </div>
+                        </div>
+                        <div class="star-card red">
+                            <i class="fa-solid fa-circle-minus"></i>
+                            <div class="star-info">
+                                <span id="display-bad-stars-side" class="star-val">0</span>
+                                <span class="star-lbl">VERMELHAS</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="display-status-tag" class="status-tag">STATUS: EM ANDAMENTO</div>
+
+                    <div class="details-section">
+                        <h3 class="section-title">DETALHES DO EXTRATO</h3>
+                        <div class="detail-item animate-slide">
+                            <div class="icon-circle red"><i class="fa-solid fa-circle-minus"></i></div>
+                            <div class="detail-info">
+                                <span class="detail-label">Estrelas Ruins</span>
+                                <span class="detail-rule">Limite: 9 para exclusão</span>
+                            </div>
+                            <div id="display-bad-stars" class="detail-val text-red">0</div>
+                        </div>
+
+                        <div class="detail-item animate-slide delay-1">
+                            <div class="icon-circle blue"><i class="fa-solid fa-trophy"></i></div>
+                            <div class="detail-info">
+                                <span class="detail-label">Progresso do Prêmio</span>
+                                <div class="prog-bar-wrap">
+                                    <div id="display-prog-fill" class="prog-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div id="display-prog-pct" class="detail-val">0%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABA: EQUIPE -->
+                <div id="tab-team" class="tab-content animate-fade">
+                    <div class="team-header">
+                        <h3>EQUIPE METAL PRINT</h3>
+                        <p>Competição Saudável</p>
+                    </div>
+                    <div id="team-list-grid" class="team-grid">
+                        <!-- Injetado por JS -->
+                    </div>
+                </div>
+            </main>
+
+            <!-- Bottom Nav -->
+            <nav class="bottom-tabs">
+                <button id="nav-btn-balance" class="nav-tab active" onclick="switchTab('balance')">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span>Início</span>
+                </button>
+                <button id="nav-btn-team" class="nav-tab" onclick="switchTab('team')">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Equipe</span>
+                </button>
+            </nav>
+        </section>
+
+        <!-- TELA DO GERENTE -->
+        <section id="screen-manager" class="screen">
+            <header class="mgr-header">
+                <div class="mgr-identity">
+                    <button class="btn-back-mgr" onclick="actionLogout()"><i
+                            class="fa-solid fa-arrow-left"></i></button>
+                    <div class="mgr-avatar"><i class="fa-solid fa-user-gear"></i></div>
+                    <h3>Painel Supervisor</h3>
+                </div>
+                <div class="mgr-nav-btns">
+                    <button class="btn-exit-mgr" onclick="actionLogout()"><i class="fa-solid fa-power-off"></i></button>
+                </div>
+            </header>
+
+            <div class="mgr-settings-bar">
+                <label>Prêmio Ativo:</label>
+                <div class="prize-input-row">
+                    <input type="text" id="input-global-prize-mgr" placeholder="Digite o prêmio aqui...">
+                    <button class="btn-prize-save" onclick="actionConfirmPrizeReset()"><i
+                            class="fa-solid fa-check"></i></button>
+                </div>
+            </div>
+
+            <!-- V21: FILA DE TRANSPARÊNCIA -->
+            <div id="mgr-transparency-bar" class="mgr-trans-bar" style="display:none;">
+                <!-- Injetado por JS -->
+            </div>
+
+            <main class="mgr-dash">
+                <div id="mgr-grid-employees" class="cards-grid">
+                    <!-- Injetado por JS -->
+                </div>
+            </main>
+        </section>
+
+        <!-- TELA DEVELOPER (LOGS) -->
+        <section id="screen-developer" class="screen">
+            <header class="mgr-header" style="background: #0f172a;">
+                <div class="mgr-identity">
+                    <button class="btn-back-mgr" onclick="actionLogout()"><i class="fa-solid fa-arrow-left"></i></button>
+                    <div class="mgr-avatar" style="background: #334155;"><i class="fa-solid fa-code"></i></div>
+                    <h3>Dev Portal</h3>
+                </div>
+                <button class="btn-exit-mgr" onclick="actionLogout()"><i class="fa-solid fa-power-off"></i></button>
+            </header>
+
+            <main class="mgr-dash">
+                <div class="dev-section">
+                    <h4 style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Dispositivos Online</h4>
+                    <div id="dev-presence-list" class="dev-log-container">
+                        <!-- Presença Injetada -->
+                    </div>
+                </div>
+
+                <div class="dev-section" style="margin-top: 20px;">
+                    <h4 style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Histórico Global de Ações</h4>
+                    <div id="dev-logs-list" class="dev-log-container logs">
+                        <!-- Logs Injetados -->
+                    </div>
+                </div>
+            </main>
+        </section>
+
+        <!-- CELEBRATION OVERLAY -->
+        <div id="celeb-overlay" class="overlay">
+            <div class="overlay-box pop-in">
+                <div class="celeb-icon">🏆</div>
+                <h2 id="celeb-title">PARABÉNS!</h2>
+                <p id="celeb-msg">Você atingiu a meta de 17 estrelas!</p>
+                <div id="celeb-instructions" class="celeb-instr" style="display:none;">
+                    Fale com o Gerente e solicite seu prêmio!
+                </div>
+                <button class="btn btn-primary" onclick="closeCeleb()">OK</button>
+            </div>
+        </div>
+
+        <!-- MODAL: CONFIRMAR RESET (CUSTOM) -->
+        <div id="modal-confirm-reset" class="overlay">
+            <div class="overlay-box modal pop-in">
+                <div class="warning-icon">⚠️</div>
+                <h3>REDEFINIR TUDO?</h3>
+                <p>Mudar o prêmio irá <b>ZERAR</b> as estrelas de todos os funcionários. Deseja continuar?</p>
+                <div class="modal-btns">
+                    <button class="btn btn-outline" onclick="closeResetModal()">Cancelar</button>
+                    <button class="btn btn-danger" onclick="actionExecuteReset()">SIM, ZERAR TUDO</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
