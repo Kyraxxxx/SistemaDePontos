@@ -1,6 +1,3 @@
-// --- DEBUG: CONFIRMAR CARREGAMENTO ---
-alert("SISTEMA V7: Código carregado com sucesso!");
-
 // --- KILL OLD SERVICE WORKER ---
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(regs => {
@@ -137,7 +134,6 @@ window.actionEmployeeAuth = function() {
                 db.ref('employees').push(data).then(ref => {
                     state.employees[ref.key] = data;
                     loginAs(ref.key, 'employee');
-                    alert("Conta criada com sucesso!");
                 }).catch(err => alert("ERRO AO CRIAR CONTA: " + err.message));
             }
 
@@ -270,28 +266,9 @@ function updateHomeButtons() {
 }
 
 function renderNamelist() {
+    // Lista removida a pedido do usuário
     const container = document.getElementById('login-names-grid');
-    if (!container) return;
-    const entries = Object.entries(state.employees || {})
-        .filter(([, emp]) => !emp.deleted)
-        .sort((a, b) => a[1].name.localeCompare(b[1].name));
-    if (entries.length === 0) {
-        container.innerHTML = '<div style="grid-column:1/-1; padding:20px; color:#64748b; font-weight:600;">Nenhum funcionário cadastrado.</div>';
-        return;
-    }
-    container.innerHTML = '';
-    entries.forEach(([, emp]) => {
-        const item = document.createElement('div');
-        item.className = 'name-item';
-        item.textContent = emp.name;
-        item.onclick = () => {
-            const nInp = document.getElementById('emp-name-input');
-            const pInp = document.getElementById('emp-pass-input');
-            if (nInp) nInp.value = emp.name;
-            if (pInp) pInp.focus();
-        };
-        container.appendChild(item);
-    });
+    if (container) container.innerHTML = '';
 }
 
 function renderActiveView() {
