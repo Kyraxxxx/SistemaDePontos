@@ -126,7 +126,6 @@ function loginAs(id, role) {
     
     addDevLog('LOGIN', `${id} (${role})`);
     renderAll();
-    updateHomeButtons();
     window.showView(role === 'manager' ? 'mgr' : (role === 'developer' ? 'developer' : 'emp'));
 }
 
@@ -163,14 +162,7 @@ function renderAll() {
 }
 
 function updateHomeButtons() {
-    const btnEmp = document.querySelector('#login-step-home .btn-primary');
-    if (!btnEmp) return;
-
-    if (state.user && state.user.role === 'employee') {
-        const name = state.employees[state.user.id]?.name || "Funcionário";
-        btnEmp.innerHTML = `<i class="fa-solid fa-user-check"></i> Entrar como ${name}`;
-        btnEmp.onclick = () => window.showView('emp');
-    }
+    // Função desativada: botões agora são fixos no HTML para evitar atraso visual
 }
 
 function renderEmployeeDash() {
@@ -221,14 +213,14 @@ function renderManagerGrid() {
         const card = document.createElement('div');
         card.className = 'm-card';
         card.innerHTML = `
-            <div class="m-head"><h4>${emp.name}</h4><i class="fa-solid fa-trash-can" onclick="window.handleEmpDelete('${id}')"></i></div>
+            <div class="m-head"><h4>${emp.name}</h4><i class="fa-solid fa-trash-can m-del" onclick="window.handleEmpDelete('${id}')"></i></div>
             <div class="m-scores">
-                <div class="m-box green"><span>${emp.goodStars || 0}</span></div>
-                <div class="m-box red"><span>${emp.badStars || 0}</span></div>
+                <div class="m-box"><span class="m-val green">${emp.goodStars || 0}</span><span class="m-lbl">Boas</span></div>
+                <div class="m-box"><span class="m-val red">${emp.badStars || 0}</span><span class="m-lbl">Ruins</span></div>
             </div>
             <div class="m-acts">
-                <button onclick="window.handlePoint('${id}','good',1)">+V</button>
-                <button onclick="window.handlePoint('${id}','bad',1)">+R</button>
+                <button class="bt-sc pos" onclick="window.handlePoint('${id}','good',1)">+ VERDE</button>
+                <button class="bt-sc neg" onclick="window.handlePoint('${id}','bad',1)">+ RUIM</button>
             </div>
         `;
         grid.appendChild(card);
