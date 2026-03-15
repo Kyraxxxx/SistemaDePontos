@@ -32,7 +32,6 @@ body {
 /* Ajuste para permitir scroll apenas onde necessário */
 main, .mgr-dash, .dash-body {
     overflow-y: auto;
-    max-height: calc(100vh - 120px);
 }
 
 /* =========================================
@@ -107,8 +106,8 @@ main, .mgr-dash, .dash-body {
     box-shadow: 0 20px 40px rgba(0,0,0,0.03);
 }
 
-.step { display: none !important; }
-.step.active { display: flex !important; flex-direction: column; gap: 1.2rem; }
+.step { display: none; }
+.step.active { display: flex; flex-direction: column; gap: 1.2rem; }
 
 /* BTNS */
 .btn {

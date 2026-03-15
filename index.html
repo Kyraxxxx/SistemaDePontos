@@ -5,12 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Metal Print - Pontuações v6</title>
+    <title>Metal Print - Pontuações V10</title>
     <!-- Outfit Font -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=10">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
@@ -22,14 +22,16 @@
         <section id="screen-login" class="screen active">
             <div class="login-container">
                 <header class="login-brand animate-down">
-                    <img src="Logo_PWA.png" alt="Logo" class="main-logo"
+                    <!-- Nome do arquivo corrigido para Logo.png conforme list_dir -->
+                    <img src="Logo.png" alt="Logo" class="main-logo"
                         onerror="this.src='https://placehold.co/120x120?text=MP'">
                     <h1>Metal Print</h1>
                     <p>Subtítulo Pontuações</p>
                 </header>
 
-                <main class="login-card animate-up">
-                    <div id="login-step-home" class="step active">
+                <main class="login-card animate-up" style="max-height: none !important;">
+                    <!-- Estilos inline de emergência para garantir visibilidade -->
+                    <div id="login-step-home" class="step active" style="display: flex !important; opacity: 1 !important; visibility: visible !important;">
                         <button class="btn btn-primary" onclick="window.changeLoginStep('employee')">
                             <i class="fa-solid fa-user-check"></i> Sou Funcionário
                         </button>
@@ -59,6 +61,10 @@
                         <button class="btn btn-primary" onclick="window.actionMgrLoginStep()">Entrar</button>
                     </div>
                 </main>
+                
+                <footer style="text-align: center; margin-top: 20px; color: #cbd5e1; font-size: 0.7rem; font-weight: 700;">
+                    SISTEMA ATUALIZADO V10 - BOTÕES DE EMERGÊNCIA
+                </footer>
             </div>
         </section>
 
@@ -214,7 +220,7 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script src="app.js?v=9"></script>
+    <script src="app.js?v=10"></script>
 </body>
 
 </html>

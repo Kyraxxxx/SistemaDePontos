@@ -315,10 +315,13 @@ function renderDeveloperPanel() {
 }
 
 window.onload = () => {
+    console.log("Iniciando SISTEMA V10 - Recuperação de UI");
     startFirebaseListeners();
     const saved = localStorage.getItem('mp_user');
     if (saved) {
         state.user = JSON.parse(saved);
         window.showView(state.user.role === 'manager' ? 'mgr' : (state.user.role === 'developer' ? 'developer' : 'emp'));
+    } else {
+        window.showView('login');
     }
 };
